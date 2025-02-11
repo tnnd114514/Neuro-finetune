@@ -1,4 +1,4 @@
-）)import json
+import json
 from datasets import Dataset
 from pathlib import Path
 
