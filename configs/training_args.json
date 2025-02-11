@@ -1,0 +1,16 @@
+{
+    "output_dir": "./results",
+    "per_device_train_batch_size": 1,  # 降低batch_size以适应数据量
+    "gradient_accumulation_steps": 16,
+    "learning_rate": 2e-5,
+    "num_train_epochs": 5,
+    "max_steps": 3000,
+    "logging_dir": "./logs",
+    "logging_steps": 20,
+    "save_steps": 300,
+    "save_total_limit": 2,
+    "fp16": false,
+    "bf16": true,
+    "lora_rank": 32,  # 降低LoRA秩以适应较小数据集
+    "style_coeff": 0.8
+}
