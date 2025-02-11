@@ -1,0 +1,8 @@
+model: deepseek-r1-distill-llama-70b
+adapter_path: ./adapters/neuro-style-lora
+quantization: q4_0
+gpu_layers: 48
+context_window: 4096
+temperature: 0.9
+top_p: 0.95
+max_tokens: 512
