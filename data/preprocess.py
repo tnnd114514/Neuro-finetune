@@ -1,4 +1,4 @@
-import json
+）)import json
 from datasets import Dataset
 from pathlib import Path
 
@@ -25,7 +25,7 @@ def preprocess_data(input_file, output_dir):
     
     # 保存处理后的数据
     dataset = Dataset.from_list(processed)
-    dataset.save_to_disk(str(Path(output_dir) / 'processed_dataset')
+    dataset.save_to_disk(str(Path(output_dir) / 'processed_dataset'))
 
 if __name__ == "__main__":
     preprocess_data(
