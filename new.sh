@@ -24,18 +24,18 @@ echo "开始安装 LLaMA-Factory:v5..."
 cd /root/autodl-tmp/
 mkdir AI
 cd LLaMA-Factory
-git clone https://github.com/hiyouga/LLaMA-Factory.git  
+git clone https://ghproxy.net/https://github.com/hiyouga/LLaMA-Factory.git  
 cd LLaMA-Factory 
 git checkout v5 
 pip install -r requirements.txt  
 cd .. 
 echo "开始安装 vits..." 
-git clone https://github.com/jaywalnut310/vits.git  
+git clone https://ghproxy.net/https://github.com/jaywalnut310/vits.git  
 cd vits 
 pip install -r requirements.txt  
 cd ..
 echo "开始安装 so-vits..." 
-git clone https://github.com/svc-develop-team/so-vits-svc.git  
+git clone https://ghproxy.net/https://github.com/svc-develop-team/so-vits-svc.git  
 cd so-vits-svc 
 pip install -r requirements.txt  
 cd .. 
