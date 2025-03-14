@@ -20,15 +20,6 @@ ollama run deepseek-r1:70b
 /bye
 echo"开始安装open-webui"
 pip install open-webui
-echo "开始安装 LLaMA-Factory:v5..." 
-cd /root/autodl-tmp/
-mkdir AI
-cd LLaMA-Factory
-git clone https://ghproxy.net/https://github.com/hiyouga/LLaMA-Factory.git  
-cd LLaMA-Factory 
-git checkout v5 
-pip install -r requirements.txt  
-cd .. 
 echo "开始安装 vits..." 
 git clone https://ghproxy.net/https://github.com/jaywalnut310/vits.git  
 cd vits 
