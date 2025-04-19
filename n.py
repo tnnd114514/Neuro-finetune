@@ -20,9 +20,9 @@ PROXY_CONFIG = { "None"  # Clash默认端口，按实际修改
 
 import httpx
 from openai import OpenAI
-from qq_botpy import Bot, AsyncMessageAPI
-from qq_botpy.message import Message, MessageSetting
-from qq_botpy.exception import ServerError
+from qq-botpy import Bot, AsyncMessageAPI
+from qq-botpy.message import Message, MessageSetting
+from qq-botpy.exception import ServerError
 
 class CustomAIBot:
     def __init__(self):
