@@ -13,69 +13,72 @@ CUSTOM_API_KEY = "sk-lCsmD3pXeLBV7MbA9IkhY0vRbYEb6BJQlEiFU3JaHyoheeOB"  # 替换
 CUSTOM_API_URL = "https://api.chatanywhere.tech/v1"  # 替换为实际API端点
 CUSTOM_MODEL = "gpt-3.5-turbo"    # 如deepseek-chat、glm-4等
 
-# 代理配置（按需设置）
-PROXY_URL = "http://127.0.0.1:7890"  # 国内访问需要代理则修改，否则设为None
+# 网络代理配置（国内服务器需要）
+PROXY_CONFIG = { "None"  # Clash默认端口，按实际修改
+}
 # ===========================================================
 
+import httpx
 from openai import OpenAI
-import qqbot
-from qqbot.core.util.yaml_util import YamlUtil
-import asyncio
+from qq_botpy import Bot, AsyncMessageAPI
+from qq_botpy.message import Message, MessageSetting
+from qq_botpy.exception import ServerError
 
 class CustomAIBot:
     def __init__(self):
         # 初始化QQ机器人
-        self.token = qqbot.Token(QQ_APP_ID, QQ_BOT_TOKEN)
-        self.message_api = qqbot.AsyncMessageAPI(self.token, False)
+        self.bot = Bot(appid=QQ_APP_ID, token=QQ_BOT_TOKEN)
         
         # 配置自定义AI客户端
         self.ai_client = OpenAI(
             api_key=CUSTOM_API_KEY,
-            base_url=CUSTOM_API_URL,  # 关键修改：指定自定义API端点
-            http_client=httpx.Client(proxies=PROXY_URL) if PROXY_URL else None
+            base_url=CUSTOM_API_URL,
+            http_client=httpx.Client(proxies=PROXY_CONFIG) if PROXY_CONFIG else None
         )
+        
+        # 注册消息处理器
+        @self.bot.on_at_message
+        async def message_handler(message: Message):
+            await self._process_message(message)
 
-    async def _handle_message(self, event, message: qqbot.Message):
-        """处理收到的QQ消息"""
+    async def _process_message(self, message: Message):
+        """处理@消息"""
         try:
-            if message.author.id == self.token.get_app_id():
-                return
-
-            # 清理消息内容
-            content = message.content.replace(f"<@!{self.token.get_app_id()}>", "").strip()
+            # 清理消息内容（移除@提及）
+            clean_content = message.content.replace(f"<@!{self.bot.app_id}>", "").strip()
             
-            if content:
-                print(f"收到消息: {content}")
+            if not clean_content:
+                return
                 
-                # 调用自定义API
-                response = self.ai_client.chat.completions.create(
-                    model=CUSTOM_MODEL,
-                    messages=[{"role": "user", "content": content}],
-                    temperature=0.7
-                )
-                
-                # 发送原始回复
-                await self.message_api.post_message(
-                    channel_id=message.channel_id,
-                    content=response.choices[0].message.content,
-                    msg_id=message.id
-                )
-                
+            print(f"[收到消息] {message.author.username}: {clean_content}")
+            
+            # 调用AI接口
+            response = self.ai_client.chat.completions.create(
+                model=CUSTOM_MODEL,
+                messages=[{"role": "user", "content": clean_content}],
+                temperature=0.7,
+                max_tokens=1024
+            )
+            
+            # 发送回复
+            reply_content = response.choices.message.content
+            await message.reply(
+                content=reply_content,
+                message_setting=MessageSetting(update_mention=False)
+            )
+            print(f"[已回复] {reply_content[:50]}...")  # 打印前50字符
+            
+        except ServerError as e:
+            print(f"[QQ API错误] {str(e)}")
         except Exception as e:
             error_msg = f"⚠️ 服务异常: {str(e)}"
-            await self.message_api.post_message(
-                channel_id=message.channel_id,
-                content=error_msg,
-                msg_id=message.id
-            )
+            await message.reply(content=error_msg)
+            print(f"[系统错误] {str(e)}")
 
     def run(self):
         """启动机器人"""
-        qqbot_handler = qqbot.Handler(
-            qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, self._handle_message
-        )
-        qqbot.async_listen_events(self.token, False, qqbot_handler)
+        self.bot.run()
 
 if __name__ == "__main__":
-    bot = CustomAIBot()
-    asyncio.get_event_loop().run_until_complete(bot.run())
+    bot_instance = CustomAIBot()
+    bot_instance.run()
